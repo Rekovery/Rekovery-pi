@@ -1,5 +1,6 @@
 from gpiozero import RGBLED
 from gpiozero import Button
+from gpiozero import DigitalInputDevice
 from colorzero import Color
 from time import sleep
 from datetime import datetime
@@ -15,12 +16,10 @@ def changeVal(button):
 PATH = os.path.expanduser('/home/pi/Videos/rekoveryOffline/')
 
 statusLed = RGBLED(21, 20, 16)
-modeOnline = False
-
+onlineSlider = DigitalInputDevice(6)
 button = Button(12)
 button.wait_for_press()
 button.when_pressed = changeVal
-
 start = True
 
 #start
@@ -29,12 +28,17 @@ start = True
 
 
 while True:
+    
     if start:
-        print("Rekovery LOG - Avvio modalita' Online"  if modeOnline else "Rekovery LOG - Avvio modalita' Offline" )
+        print("Rekovery LOG - Avvio modalita' Online"  if onlineSlider.value else "Rekovery LOG - Avvio modalita' Offline" )
         
-        if(modeOnline):
+        if(onlineSlider.value):
             statusLed.blink(0.2, 0.2, 0, 0, Color('blue'))
-
+            while start:
+                sleep(0.1)
+            statusLed.color = Color("green")  
+            sleep(2)
+            statusLed.off()
         else:
                 statusLed.blink(0.2, 0.2, 0, 0, Color('red'))
                 time = datetime.now()
